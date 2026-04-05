@@ -2,6 +2,7 @@ import "./style.css";
 import { setupEditors, type DiagnosticItem } from "./editor/index.js";
 import { loadWasmBridge, type Diagnostic } from "./runner/wasm-bridge.js";
 import { executeGoSource } from "./runner/executor.js";
+import { THEME_LIGHT, THEME_DARK } from "./editor/theme.js";
 
 // ─── Pane resizer ─────────────────────────────────────────────────────────────
 function initResizer() {
@@ -113,6 +114,12 @@ async function main() {
     document.getElementById("editor-container")!,
     document.getElementById("go-source-editor-container")!,
   );
+
+  // Switch editor theme when the OS colour scheme changes
+  const darkMq = window.matchMedia("(prefers-color-scheme: dark)");
+  darkMq.addEventListener("change", (e) => {
+    editorResult.setTheme(e.matches ? THEME_DARK : THEME_LIGHT);
+  });
 
   // Click on diagnostics jumps to position in editor
   diagnosticList.addEventListener("click", (e) => {

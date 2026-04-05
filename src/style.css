@@ -5,21 +5,46 @@
 }
 
 :root {
-  --bg-base: #0d1117;
-  --bg-surface: #161b22;
-  --bg-elevated: #1f2937;
-  --border: #30363d;
-  --text-primary: #e6edf3;
-  --text-secondary: #8b949e;
-  --text-muted: #484f58;
-  --accent: #7c6cff;
-  --accent-hover: #9582ff;
-  --success: #3fb950;
-  --warning: #d29922;
-  --error: #f85149;
-  --info: #58a6ff;
   --toolbar-height: 48px;
   --tab-height: 36px;
+}
+
+/* GitHub Light */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-base: #ffffff;
+    --bg-surface: #f6f8fa;
+    --bg-elevated: #eaeef2;
+    --border: #d0d7de;
+    --text-primary: #24292f;
+    --text-secondary: #57606a;
+    --text-muted: #8c959f;
+    --accent: #0969da;
+    --accent-hover: #0860ca;
+    --success: #1a7f37;
+    --warning: #9a6700;
+    --error: #cf222e;
+    --info: #0969da;
+  }
+}
+
+/* GitHub Dark */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-base: #0d1117;
+    --bg-surface: #161b22;
+    --bg-elevated: #1f2937;
+    --border: #30363d;
+    --text-primary: #e6edf3;
+    --text-secondary: #8b949e;
+    --text-muted: #484f58;
+    --accent: #58a6ff;
+    --accent-hover: #79b8ff;
+    --success: #3fb950;
+    --warning: #d29922;
+    --error: #f85149;
+    --info: #58a6ff;
+  }
 }
 
 html, body {
