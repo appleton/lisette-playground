@@ -129,11 +129,12 @@ export async function loadWasmBridge(): Promise<LisetteBridge> {
   if (_bridge) return _bridge;
 
   // Load the wasm-pack generated module from public/wasm/.
-  // The URL is resolved at runtime by the browser; tsc can't find it at
-  // compile time, so we load it via Function to avoid the TS2307 error.
-  const loadMod = new Function('return import("/wasm/lisette_wasm.js")');
+  // We pass the URL as a parameter so Vite replaces import.meta.env.BASE_URL
+  // at build time, while still hiding the dynamic import from tsc (TS2307).
+  const wasmJsUrl = `${import.meta.env.BASE_URL}wasm/lisette_wasm.js`;
+  const loadMod = new Function("url", "return import(url)");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mod = (await loadMod()) as any;
+  const mod = (await loadMod(wasmJsUrl)) as any;
 
   // wasm-pack generates a default export that initialises the WASM binary.
   await mod.default();
