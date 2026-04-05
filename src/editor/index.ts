@@ -1,6 +1,7 @@
 import type * as Monaco from "monaco-editor";
 import { LANG_ID, registerLanguage, registerCompletionProvider, registerHoverProvider, registerFormatProvider } from "./language.js";
 import { THEME_NAME, registerTheme } from "./theme.js";
+import { wireTextMateGrammar } from "./textmate.js";
 import type { LisetteBridge } from "../runner/wasm-bridge.js";
 
 const INITIAL_CODE = `// Welcome to the Lisette Playground!
@@ -93,6 +94,12 @@ export async function setupEditors(
     return {
       contents: [{ value: hover.markdown }],
     };
+  });
+
+  // Upgrade Monarch tokenizer → official TextMate grammar (async, non-blocking).
+  // wireTmGrammars re-tokenizes all open models automatically once loaded.
+  wireTextMateGrammar(monaco).catch((err) => {
+    console.warn("[textmate] Failed to load TM grammar, using Monarch fallback:", err);
   });
 
   // Main Lisette editor

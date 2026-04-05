@@ -2,12 +2,19 @@ import type * as Monaco from "monaco-editor";
 
 export const LANG_ID = "lisette";
 
-// All keywords from the Lisette language reference
+// All keywords from the Lisette language reference + VSCode extension grammar
 export const LISETTE_KEYWORDS = [
-  "as", "break", "const", "continue", "defer", "else", "enum", "fn",
-  "for", "if", "impl", "import", "in", "interface", "let", "loop",
-  "match", "mut", "pub", "recover", "return", "select", "struct",
-  "task", "try", "type", "while",
+  // control flow
+  "as", "break", "continue", "else", "for", "if", "in", "loop",
+  "match", "return", "while",
+  // storage
+  "const", "enum", "fn", "impl", "interface", "struct", "type", "var",
+  // modifiers
+  "pub", "mut",
+  // others
+  "defer", "import", "let", "recover", "select", "task", "try",
+  // special variables (treated as keywords for completion purposes)
+  "self",
 ];
 
 // Built-in primitive types
@@ -18,6 +25,8 @@ export const LISETTE_PRIMITIVE_TYPES = [
   "float32", "float64",
   "complex64", "complex128",
   "bool", "string", "error",
+  // Built-in type + built-in functions
+  "Never", "panic", "assert_type",
 ];
 
 // Generic/compound types
@@ -82,6 +91,8 @@ export function registerLanguage(monaco: typeof Monaco): void {
 
   monaco.languages.setMonarchTokensProvider(LANG_ID, {
     keywords: LISETTE_KEYWORDS,
+    // self is a special variable, not a keyword, but highlight it like one
+    selfKeywords: ["self"],
     primitiveTypes: LISETTE_PRIMITIVE_TYPES,
     compoundTypes: LISETTE_COMPOUND_TYPES,
     constructors: LISETTE_CONSTRUCTORS,
@@ -114,12 +125,16 @@ export function registerLanguage(monaco: typeof Monaco): void {
         // Attributes
         [/#\[/, "attribute", "@attribute"],
 
+        // @rawgo directive
+        [/@rawgo\b/, "keyword.other"],
+
         // Keywords and identifiers
         [
           /[a-z_][a-z0-9_]*/,
           {
             cases: {
               "@keywords": "keyword",
+              "@selfKeywords": "variable.language",
               "@constructors": "constant",
               "@default": "identifier",
             },
@@ -333,6 +348,11 @@ export const LISETTE_SNIPPETS: SnippetDef[] = [
     label: "import",
     insertText: 'import "${1:go:fmt}"',
     documentation: "Import a Go package",
+  },
+  {
+    label: "var",
+    insertText: "var ${1:name}: ${2:Type}",
+    documentation: "Variable declaration (var)",
   },
   {
     label: "lambda",

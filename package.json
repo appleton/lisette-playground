@@ -11,7 +11,10 @@
     "build:all": "npm run build:wasm && npm run build"
   },
   "dependencies": {
-    "monaco-editor": "^0.52.2"
+    "monaco-editor": "^0.52.2",
+    "monaco-editor-textmate": "^4.0.0",
+    "onigasm": "^2.2.5",
+    "vscode-textmate": "^9.3.2"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
