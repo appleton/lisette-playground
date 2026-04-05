@@ -22,6 +22,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
@@ -35,7 +38,7 @@ jobs:
         # VITE_BASE_PATH must match the GitHub Pages sub-path for the repo.
         # For a repo named "lisette-playground" under user/org "appleton"
         # the Pages URL is https://appleton.github.io/lisette-playground/
-        run: npm run build
+        run: npx vite build
         env:
           VITE_BASE_PATH: /lisette-playground/
 
