@@ -11,16 +11,16 @@ const INITIAL_CODE = `// Welcome to the Lisette Playground!
 import "go:fmt"
 
 fn fibonacci(n: int) -> int {
-  match n {
-    0 => 0,
-    1 => 1,
-    _ => fibonacci(n - 1) + fibonacci(n - 2),
+  if n <= 1 {
+    n
+  } else {
+    fibonacci(n - 1) + fibonacci(n - 2)
   }
 }
 
 fn main() {
   for i in 0..10 {
-    fmt::printf("fib(%d) = %d\\n", i, fibonacci(i))
+    fmt.Printf("fib(%d) = %d\\n", i, fibonacci(i))
   }
 }
 `;

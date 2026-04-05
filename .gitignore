@@ -13,3 +13,4 @@ wasm/pkg/
 /playwright/.cache/
 /playwright/.auth/
 /.playwright-cli/
+/wasm/.playwright-cli/
