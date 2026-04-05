@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.DS_Store
+
+# wasm-pack build artefacts (committed: public/wasm/ is source-controlled after build)
+wasm/target/
+wasm/pkg/
