@@ -14,8 +14,9 @@ import { wireTmGrammars } from "monaco-editor-textmate";
 
 import { LANG_ID } from "./language.js";
 
-const ONIGASM_WASM_URL = "/onigasm.wasm";
-const TM_GRAMMAR_URL   = "/lisette.tmLanguage.json";
+// BASE_URL is replaced by Vite at build time (e.g. "/lisette-playground/" on GH Pages).
+const ONIGASM_WASM_URL = `${import.meta.env.BASE_URL}onigasm.wasm`;
+const TM_GRAMMAR_URL   = `${import.meta.env.BASE_URL}lisette.tmLanguage.json`;
 const TM_SCOPE         = "source.lisette";
 
 let _wirePromise: Promise<void> | null = null;
