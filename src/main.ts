@@ -2,6 +2,7 @@ import "./style.css";
 import { setupEditors, type DiagnosticItem } from "./editor/index.js";
 import { loadWasmBridge, type Diagnostic } from "./runner/wasm-bridge.js";
 import { executeGoSource } from "./runner/executor.js";
+import { THEME_LIGHT, THEME_DARK } from "./editor/theme.js";
 
 // ─── Pane resizer ─────────────────────────────────────────────────────────────
 function initResizer() {
@@ -44,8 +45,34 @@ const btnCheck       = document.getElementById("btn-check") as HTMLButtonElement
 const statusEl       = document.getElementById("status-indicator")!;
 const outputText     = document.getElementById("output-text")!;
 const diagnosticList = document.getElementById("diagnostics-list")!;
-const tabBtns        = document.querySelectorAll<HTMLButtonElement>(".tab-btn");
+const outputPane     = document.getElementById("output-pane")!;
+const drawerToggle   = document.getElementById("drawer-toggle")!;
+const tabBtns        = document.querySelectorAll<HTMLButtonElement>(".tab-btn[data-tab]");
 const tabPanels      = document.querySelectorAll<HTMLElement>(".tab-panel");
+
+// ─── Mobile drawer ─────────────────────────────────────────────────────────────
+const isMobile = () => window.matchMedia("(max-width: 640px)").matches;
+
+function openDrawer() {
+  if (isMobile()) outputPane.classList.add("drawer-open");
+}
+
+function toggleDrawer() {
+  if (isMobile()) outputPane.classList.toggle("drawer-open");
+}
+
+drawerToggle.addEventListener("click", () => {
+  toggleDrawer();
+});
+
+// Tapping the tab strip on mobile also opens the drawer
+document.getElementById("output-tabs")!.addEventListener("click", () => {
+  if (!isMobile()) return;
+  // Only open (never close) from tab strip — close is the chevron button's job
+  if (!outputPane.classList.contains("drawer-open")) {
+    openDrawer();
+  }
+});
 
 // ─── Tab switching ─────────────────────────────────────────────────────────────
 tabBtns.forEach((btn) => {
@@ -68,6 +95,7 @@ function setStatus(kind: StatusKind, label: string) {
 
 function setOutput(html: string) {
   outputText.innerHTML = html;
+  openDrawer();
 }
 
 function setButtons(disabled: boolean) {
@@ -113,6 +141,12 @@ async function main() {
     document.getElementById("editor-container")!,
     document.getElementById("go-source-editor-container")!,
   );
+
+  // Switch editor theme when the OS colour scheme changes
+  const darkMq = window.matchMedia("(prefers-color-scheme: dark)");
+  darkMq.addEventListener("change", (e) => {
+    editorResult.setTheme(e.matches ? THEME_DARK : THEME_LIGHT);
+  });
 
   // Click on diagnostics jumps to position in editor
   diagnosticList.addEventListener("click", (e) => {
@@ -180,8 +214,9 @@ async function main() {
     editorResult.addMarkers(editorDiags);
     renderDiagnostics(diags);
 
-    // Switch to diagnostics tab
+    // Switch to diagnostics tab and open drawer on mobile
     document.querySelector<HTMLButtonElement>('[data-tab="diagnostics"]')?.click();
+    openDrawer();
 
     const errors = diags.filter((d) => d.severity === "error").length;
     const warnings = diags.filter((d) => d.severity === "warning").length;
