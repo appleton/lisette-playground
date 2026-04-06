@@ -482,6 +482,15 @@ html, body {
   }
 }
 
+/* ─── Monaco: prevent iOS zoom on editor focus ─────────────────── */
+/* iOS Safari zooms in when focusing any input with font-size < 16px.
+   Monaco's textarea is its invisible input capture mechanism — setting
+   its font-size to 16px prevents zoom without affecting the visual
+   rendering, which Monaco handles through its own DOM layer. */
+.monaco-editor .inputarea {
+  font-size: 16px !important;
+}
+
 /* ─── Monaco: hide the iPad virtual-keyboard trigger button ─── */
 /* Monaco renders a "Show keyboard" button in the bottom-right corner
    on touch devices. We handle keyboard access through the editor
