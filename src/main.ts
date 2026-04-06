@@ -61,17 +61,15 @@ function toggleDrawer() {
   if (isMobile()) outputPane.classList.toggle("drawer-open");
 }
 
-drawerToggle.addEventListener("click", () => {
+drawerToggle.addEventListener("click", (e) => {
+  e.stopPropagation(); // prevent bubbling to output-tabs open handler
   toggleDrawer();
 });
 
-// Tapping the tab strip on mobile also opens the drawer
+// Tapping the tab strip (but not the chevron) on mobile opens the drawer
 document.getElementById("output-tabs")!.addEventListener("click", () => {
   if (!isMobile()) return;
-  // Only open (never close) from tab strip — close is the chevron button's job
-  if (!outputPane.classList.contains("drawer-open")) {
-    openDrawer();
-  }
+  openDrawer(); // idempotent — adds class if not already present
 });
 
 // ─── Tab switching ─────────────────────────────────────────────────────────────

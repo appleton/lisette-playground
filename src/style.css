@@ -470,4 +470,22 @@ html, body {
   #output-pane.drawer-open #drawer-chevron {
     transform: rotate(180deg);
   }
+
+  /* ── Editor scroll feel ─────────────────────── */
+  /* Allow the browser to handle vertical panning natively so the
+     editor content scrolls with momentum. Monaco still intercepts
+     horizontal swipes for the minimap / line scrolling. */
+  .monaco-editor .overflow-guard,
+  .monaco-editor .monaco-scrollable-element {
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ─── Monaco: hide the iPad virtual-keyboard trigger button ─── */
+/* Monaco renders a "Show keyboard" button in the bottom-right corner
+   on touch devices. We handle keyboard access through the editor
+   itself, so this button is redundant and visually out of place. */
+.monaco-editor .iPadShowKeyboard {
+  display: none !important;
 }
