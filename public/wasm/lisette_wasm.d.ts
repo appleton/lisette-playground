@@ -13,10 +13,9 @@ export function check(code: string): string;
 export function compile(code: string): string;
 
 /**
- * Completion items at byte offset (JSON array).
- * Semantic completions are a TODO; keyword/snippet completions come from the TS layer.
+ * Semantic completion items at byte offset (JSON array).
  */
-export function complete(_code: string, _offset: number): string;
+export function complete(code: string, offset: number): string;
 
 /**
  * Format Lisette source. Returns the formatted source, or the original on failure.
@@ -24,11 +23,21 @@ export function complete(_code: string, _offset: number): string;
 export function format(code: string): string;
 
 /**
- * Hover info at byte offset. Returns `{ "markdown": "..." }` or empty string.
+ * Go-to-definition at byte offset. Returns JSON `{ "line", "col", "end_line", "end_col" }` or empty.
  */
-export function hover(_code: string, _offset: number): string;
+export function goto_definition(code: string, offset: number): string;
+
+/**
+ * Hover info at byte offset. Returns JSON `{ "markdown": "...", ... }` or empty string.
+ */
+export function hover(code: string, offset: number): string;
 
 export function init(): void;
+
+/**
+ * Signature help for a function call at byte offset. Returns JSON or empty string.
+ */
+export function signature_help(code: string, offset: number): string;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
@@ -38,8 +47,10 @@ export interface InitOutput {
     readonly compile: (a: number, b: number) => [number, number];
     readonly complete: (a: number, b: number, c: number) => [number, number];
     readonly format: (a: number, b: number) => [number, number];
+    readonly goto_definition: (a: number, b: number, c: number) => [number, number];
     readonly hover: (a: number, b: number, c: number) => [number, number];
     readonly init: () => void;
+    readonly signature_help: (a: number, b: number, c: number) => [number, number];
     readonly __wbindgen_free: (a: number, b: number, c: number) => void;
     readonly __wbindgen_malloc: (a: number, b: number) => number;
     readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;

@@ -13,6 +13,7 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 console_error_panic_hook = "0.1"
 rustc-hash = "2"
+ecow = "0.2"
 
 # Lisette compiler crates (git dependency – entire workspace)
 lisette-format      = { git = "https://github.com/ivov/lisette", package = "lisette-format" }

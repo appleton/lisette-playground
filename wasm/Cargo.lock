@@ -147,6 +147,7 @@ name = "lisette-wasm"
 version = "0.1.0"
 dependencies = [
  "console_error_panic_hook",
+ "ecow",
  "lisette-diagnostics",
  "lisette-emit",
  "lisette-format",

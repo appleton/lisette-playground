@@ -472,6 +472,46 @@ export function registerHoverProvider(
   });
 }
 
+// ─── Definition provider ─────────────────────────────────────────────────────
+export function registerDefinitionProvider(
+  monaco: typeof Monaco,
+  getDefinition: (
+    model: Monaco.editor.ITextModel,
+    position: Monaco.Position
+  ) => Promise<Monaco.languages.Definition | null>
+): Monaco.IDisposable {
+  return monaco.languages.registerDefinitionProvider(LANG_ID, {
+    async provideDefinition(model, position) {
+      try {
+        return await getDefinition(model, position);
+      } catch {
+        return null;
+      }
+    },
+  });
+}
+
+// ─── Signature help provider ─────────────────────────────────────────────────
+export function registerSignatureHelpProvider(
+  monaco: typeof Monaco,
+  getSignatureHelp: (
+    model: Monaco.editor.ITextModel,
+    position: Monaco.Position
+  ) => Promise<Monaco.languages.SignatureHelpResult | null>
+): Monaco.IDisposable {
+  return monaco.languages.registerSignatureHelpProvider(LANG_ID, {
+    signatureHelpTriggerCharacters: ["(", ","],
+    signatureHelpRetriggerCharacters: [","],
+    async provideSignatureHelp(model, position) {
+      try {
+        return await getSignatureHelp(model, position);
+      } catch {
+        return null;
+      }
+    },
+  });
+}
+
 // ─── Format provider ──────────────────────────────────────────────────────────
 export function registerFormatProvider(
   monaco: typeof Monaco,

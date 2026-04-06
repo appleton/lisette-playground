@@ -13,6 +13,8 @@ interface LisetteWasmModule {
   compile(code: string): string;
   complete(code: string, offset: number): string;
   hover(code: string, offset: number): string;
+  goto_definition(code: string, offset: number): string;
+  signature_help(code: string, offset: number): string;
 }
 
 export interface Diagnostic {
@@ -49,6 +51,23 @@ export interface CompletionItem {
 
 export interface HoverResult {
   markdown: string;
+  startLine?: number;
+  startCol?: number;
+  endLine?: number;
+  endCol?: number;
+}
+
+export interface DefinitionResult {
+  line: number;
+  col: number;
+  endLine: number;
+  endCol: number;
+}
+
+export interface SignatureHelpResult {
+  label: string;
+  parameters: string[];
+  activeParameter: number;
 }
 
 export interface LisetteBridge {
@@ -57,6 +76,8 @@ export interface LisetteBridge {
   compile(code: string): Promise<CompileResult>;
   complete(code: string, offset: number): Promise<CompletionItem[]>;
   hover(code: string, offset: number): Promise<HoverResult | null>;
+  gotoDefinition(code: string, offset: number): Promise<DefinitionResult | null>;
+  signatureHelp(code: string, offset: number): Promise<SignatureHelpResult | null>;
 }
 
 class WasmBridge implements LisetteBridge {
@@ -116,7 +137,60 @@ class WasmBridge implements LisetteBridge {
     try {
       const raw = this.wasm.hover(code, offset);
       if (!raw) return null;
-      return JSON.parse(raw) as HoverResult;
+      const parsed = JSON.parse(raw) as {
+        markdown: string;
+        start_line?: number;
+        start_col?: number;
+        end_line?: number;
+        end_col?: number;
+      };
+      return {
+        markdown: parsed.markdown,
+        startLine: parsed.start_line,
+        startCol: parsed.start_col,
+        endLine: parsed.end_line,
+        endCol: parsed.end_col,
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  async gotoDefinition(code: string, offset: number): Promise<DefinitionResult | null> {
+    try {
+      const raw = this.wasm.goto_definition(code, offset);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as {
+        line: number;
+        col: number;
+        end_line: number;
+        end_col: number;
+      };
+      return {
+        line: parsed.line,
+        col: parsed.col,
+        endLine: parsed.end_line,
+        endCol: parsed.end_col,
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  async signatureHelp(code: string, offset: number): Promise<SignatureHelpResult | null> {
+    try {
+      const raw = this.wasm.signature_help(code, offset);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as {
+        label: string;
+        parameters: string[];
+        active_parameter: number;
+      };
+      return {
+        label: parsed.label,
+        parameters: parsed.parameters,
+        activeParameter: parsed.active_parameter,
+      };
     } catch {
       return null;
     }

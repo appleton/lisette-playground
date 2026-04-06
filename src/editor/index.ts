@@ -1,5 +1,5 @@
 import type * as Monaco from "monaco-editor";
-import { LANG_ID, registerLanguage, registerCompletionProvider, registerHoverProvider, registerFormatProvider } from "./language.js";
+import { LANG_ID, registerLanguage, registerCompletionProvider, registerHoverProvider, registerFormatProvider, registerDefinitionProvider, registerSignatureHelpProvider } from "./language.js";
 import { registerThemes, preferredTheme } from "./theme.js";
 import { wireTextMateGrammar } from "./textmate.js";
 import type { LisetteBridge } from "../runner/wasm-bridge.js";
@@ -93,8 +93,55 @@ export async function setupEditors(
     const offset = model.getOffsetAt(position);
     const hover = await bridge.hover(code, offset);
     if (!hover) return null;
-    return {
+    const result: Monaco.languages.Hover = {
       contents: [{ value: hover.markdown }],
+    };
+    if (hover.startLine && hover.startCol && hover.endLine && hover.endCol) {
+      result.range = {
+        startLineNumber: hover.startLine,
+        startColumn: hover.startCol,
+        endLineNumber: hover.endLine,
+        endColumn: hover.endCol,
+      };
+    }
+    return result;
+  });
+
+  // Go-to-definition provider backed by WASM bridge
+  registerDefinitionProvider(monaco, async (model, position) => {
+    if (!bridge) return null;
+    const code = model.getValue();
+    const offset = model.getOffsetAt(position);
+    const def = await bridge.gotoDefinition(code, offset);
+    if (!def) return null;
+    return {
+      uri: model.uri,
+      range: {
+        startLineNumber: def.line,
+        startColumn: def.col,
+        endLineNumber: def.endLine,
+        endColumn: def.endCol,
+      },
+    };
+  });
+
+  // Signature help provider backed by WASM bridge
+  registerSignatureHelpProvider(monaco, async (model, position) => {
+    if (!bridge) return null;
+    const code = model.getValue();
+    const offset = model.getOffsetAt(position);
+    const sig = await bridge.signatureHelp(code, offset);
+    if (!sig) return null;
+    return {
+      value: {
+        signatures: [{
+          label: sig.label,
+          parameters: sig.parameters.map((p) => ({ label: p })),
+        }],
+        activeSignature: 0,
+        activeParameter: sig.activeParameter,
+      },
+      dispose: () => {},
     };
   });
 

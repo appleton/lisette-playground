@@ -42,19 +42,18 @@ export function compile(code) {
 }
 
 /**
- * Completion items at byte offset (JSON array).
- * Semantic completions are a TODO; keyword/snippet completions come from the TS layer.
- * @param {string} _code
- * @param {number} _offset
+ * Semantic completion items at byte offset (JSON array).
+ * @param {string} code
+ * @param {number} offset
  * @returns {string}
  */
-export function complete(_code, _offset) {
+export function complete(code, offset) {
     let deferred2_0;
     let deferred2_1;
     try {
-        const ptr0 = passStringToWasm0(_code, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const ptr0 = passStringToWasm0(code, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.complete(ptr0, len0, _offset);
+        const ret = wasm.complete(ptr0, len0, offset);
         deferred2_0 = ret[0];
         deferred2_1 = ret[1];
         return getStringFromWasm0(ret[0], ret[1]);
@@ -84,18 +83,39 @@ export function format(code) {
 }
 
 /**
- * Hover info at byte offset. Returns `{ "markdown": "..." }` or empty string.
- * @param {string} _code
- * @param {number} _offset
+ * Go-to-definition at byte offset. Returns JSON `{ "line", "col", "end_line", "end_col" }` or empty.
+ * @param {string} code
+ * @param {number} offset
  * @returns {string}
  */
-export function hover(_code, _offset) {
+export function goto_definition(code, offset) {
     let deferred2_0;
     let deferred2_1;
     try {
-        const ptr0 = passStringToWasm0(_code, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const ptr0 = passStringToWasm0(code, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.hover(ptr0, len0, _offset);
+        const ret = wasm.goto_definition(ptr0, len0, offset);
+        deferred2_0 = ret[0];
+        deferred2_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+    }
+}
+
+/**
+ * Hover info at byte offset. Returns JSON `{ "markdown": "...", ... }` or empty string.
+ * @param {string} code
+ * @param {number} offset
+ * @returns {string}
+ */
+export function hover(code, offset) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const ptr0 = passStringToWasm0(code, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.hover(ptr0, len0, offset);
         deferred2_0 = ret[0];
         deferred2_1 = ret[1];
         return getStringFromWasm0(ret[0], ret[1]);
@@ -106,6 +126,27 @@ export function hover(_code, _offset) {
 
 export function init() {
     wasm.init();
+}
+
+/**
+ * Signature help for a function call at byte offset. Returns JSON or empty string.
+ * @param {string} code
+ * @param {number} offset
+ * @returns {string}
+ */
+export function signature_help(code, offset) {
+    let deferred2_0;
+    let deferred2_1;
+    try {
+        const ptr0 = passStringToWasm0(code, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.signature_help(ptr0, len0, offset);
+        deferred2_0 = ret[0];
+        deferred2_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred2_0, deferred2_1, 1);
+    }
 }
 
 function __wbg_get_imports() {
