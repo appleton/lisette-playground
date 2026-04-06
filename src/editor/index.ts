@@ -1,6 +1,6 @@
 import type * as Monaco from "monaco-editor";
 import { LANG_ID, registerLanguage, registerCompletionProvider, registerHoverProvider, registerFormatProvider } from "./language.js";
-import { THEME_NAME, registerTheme } from "./theme.js";
+import { registerThemes, preferredTheme } from "./theme.js";
 import { wireTextMateGrammar } from "./textmate.js";
 import type { LisetteBridge } from "../runner/wasm-bridge.js";
 
@@ -11,16 +11,16 @@ const INITIAL_CODE = `// Welcome to the Lisette Playground!
 import "go:fmt"
 
 fn fibonacci(n: int) -> int {
-  match n {
-    0 => 0,
-    1 => 1,
-    _ => fibonacci(n - 1) + fibonacci(n - 2),
+  if n <= 1 {
+    n
+  } else {
+    fibonacci(n - 1) + fibonacci(n - 2)
   }
 }
 
 fn main() {
   for i in 0..10 {
-    fmt::printf("fib(%d) = %d\\n", i, fibonacci(i))
+    fmt.Printf("fib(%d) = %d\\n", i, fibonacci(i))
   }
 }
 `;
@@ -32,6 +32,7 @@ export interface EditorSetupResult {
   setGoSource: (source: string) => void;
   setBridge: (bridge: LisetteBridge) => void;
   addMarkers: (diagnostics: DiagnosticItem[]) => void;
+  setTheme: (themeName: string) => void;
 }
 
 export interface DiagnosticItem {
@@ -49,8 +50,9 @@ export async function setupEditors(
 ): Promise<EditorSetupResult> {
   const monaco = await import("monaco-editor");
 
-  registerTheme(monaco);
+  registerThemes(monaco);
   registerLanguage(monaco);
+  const theme = preferredTheme();
 
   let bridge: LisetteBridge | null = null;
 
@@ -106,7 +108,7 @@ export async function setupEditors(
   const mainEditor = monaco.editor.create(editorContainer, {
     value: INITIAL_CODE,
     language: LANG_ID,
-    theme: THEME_NAME,
+    theme,
     fontSize: 14,
     lineHeight: 22,
     fontFamily: '"Fira Code", "Cascadia Code", "JetBrains Mono", ui-monospace, monospace',
@@ -134,7 +136,7 @@ export async function setupEditors(
   const goSourceEditor = monaco.editor.create(goSourceContainer, {
     value: "// Compiled Go source will appear here after running your code.",
     language: "go",
-    theme: THEME_NAME,
+    theme,
     fontSize: 13,
     lineHeight: 21,
     fontFamily: '"Fira Code", "Cascadia Code", "JetBrains Mono", ui-monospace, monospace',
@@ -156,6 +158,9 @@ export async function setupEditors(
     },
     setBridge: (b: LisetteBridge) => {
       bridge = b;
+    },
+    setTheme: (themeName: string) => {
+      monaco.editor.setTheme(themeName);
     },
     addMarkers: (diagnostics: DiagnosticItem[]) => {
       const model = mainEditor.getModel();

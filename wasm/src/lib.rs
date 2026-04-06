@@ -73,10 +73,19 @@ struct MemoryLoader {
 }
 
 impl Loader for MemoryLoader {
-    fn scan_folder(&self, _folder: &str) -> Files {
-        let mut map: FxHashMap<String, String> = FxHashMap::default();
-        map.insert(self.filename.clone(), self.source.clone());
-        map
+    fn scan_folder(&self, folder: &str) -> Files {
+        // Only return files for the semantic analysis entry module ("_entry_").
+        // Any other folder — including Go stdlib identifiers like "go:fmt" — must
+        // return an empty map, otherwise the module-graph builder treats the
+        // playground source as belonging to those modules and reports false import
+        // cycles (e.g. "go:fmt -> go:fmt").
+        if folder == "_entry_" {
+            let mut map: FxHashMap<String, String> = FxHashMap::default();
+            map.insert(self.filename.clone(), self.source.clone());
+            map
+        } else {
+            FxHashMap::default()
+        }
     }
 }
 
@@ -228,7 +237,7 @@ pub fn compile(code: &str) -> String {
         Some(
             files
                 .iter()
-                .map(|f| format!("// === {} ===\n{}", f.name, f.source))
+                .map(|f| format!("// === {} ===\n{}", f.name, f.to_go()))
                 .collect::<Vec<_>>()
                 .join("\n\n"),
         )

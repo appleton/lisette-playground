@@ -125,8 +125,8 @@ export function registerLanguage(monaco: typeof Monaco): void {
         // Attributes
         [/#\[/, "attribute", "@attribute"],
 
-        // @rawgo directive
-        [/@rawgo\b/, "keyword.other"],
+        // @rawgo directive ([@] avoids Monarch treating @ as an attribute reference)
+        [/[@]rawgo\b/, "keyword.other"],
 
         // Keywords and identifiers
         [
