@@ -6,6 +6,23 @@
  */
 
 const GO_PLAYGROUND_API = "https://play.golang.org/compile";
+const GO_PLAYGROUND_FMT = "https://play.golang.org/fmt";
+
+/** Format Go source via the Go Playground /fmt endpoint. Returns the original on any failure. */
+export async function formatGoSource(goSource: string): Promise<string> {
+  try {
+    const response = await fetch(GO_PLAYGROUND_FMT, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ body: goSource }).toString(),
+    });
+    if (!response.ok) return goSource;
+    const data = (await response.json()) as { Body?: string; Error?: string };
+    return data.Body && !data.Error ? data.Body : goSource;
+  } catch {
+    return goSource;
+  }
+}
 
 export interface ExecuteResult {
   stdout: string;

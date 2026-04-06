@@ -1,7 +1,7 @@
 import "./style.css";
 import { setupEditors, type DiagnosticItem } from "./editor/index.js";
 import { loadWasmBridge, type Diagnostic } from "./runner/wasm-bridge.js";
-import { executeGoSource } from "./runner/executor.js";
+import { executeGoSource, formatGoSource } from "./runner/executor.js";
 import { THEME_LIGHT, THEME_DARK } from "./editor/theme.js";
 
 // ─── Pane resizer ─────────────────────────────────────────────────────────────
@@ -289,7 +289,8 @@ async function main() {
       }
 
       goSource = compileResult.goSource;
-      editorResult.setGoSource(goSource);
+      // Format the Go output via the Playground /fmt endpoint (best-effort, non-blocking)
+      editorResult.setGoSource(await formatGoSource(goSource));
     } else {
       // WASM not available – show stub message
       setOutput('<span class="output-error">WASM compiler not loaded. Run `npm run build:wasm` to build the compiler module.</span>');
